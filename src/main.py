@@ -14,7 +14,7 @@ import pathlib
 
 import numpy as np
 
-from src import element
+from src import elements
 from src import forces
 from src import nodes
 
@@ -27,7 +27,7 @@ def main(
 ) -> None:
 
     node_structure = nodes.Nodes(nodes_file, displacements_file)
-    element_structure = element.Elements(elements_file)
+    element_structure = elements.Elements(elements_file)
     element_structure.contruct_element_stiffness_matrices(node_structure.get_nodes())
     forces_structure = forces.Forces(forces_file, len(node_structure.get_nodes()))
     node_dict = node_structure.get_nodes()
