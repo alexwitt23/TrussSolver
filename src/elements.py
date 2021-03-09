@@ -18,7 +18,12 @@ class Element:
 
 class Elements:
     def __init__(self, elements_file: pathlib.Path) -> None:
-        assert elements_file.is_file(), f"Can't read {elements_file}."
+
+        if not isinstance(elements_file, pathlib.Path):
+            raise TypeError(f"{elements_file} must be a `pathlib.Path`.")
+
+        if not elements_file.is_file():
+            raise FileNotFoundError(f"Can't read {elements_file}.")
 
         self.elements = {}
 
@@ -30,7 +35,7 @@ class Elements:
             else:
                 # Strip the line of everything and just get the numbers
                 self.elements[idx] = Element(
-                    *[int(n) for n in text.split() if n.isdigit()]
+                    *[float(n) for n in text.split()]
                 )
 
     def contruct_element_stiffness_matrices(self, node_structure: nodes.Nodes) -> None:
@@ -54,8 +59,6 @@ class Elements:
                 * element.a
                 / element_length
             )
-
-            print(element.idx, element.stiffnes_matrix)
 
     def find_internal_forces(self):
         self.internal_forces = []

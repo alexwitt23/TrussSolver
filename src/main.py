@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 
-"""
+"""The main script used to solve a simple 2D truss problem.
 PYTHONPATH=. src/main.py \
     --displacements_file examples/displacements.txt \
     --elements_file examples/elements.txt \
     --forces_file examples/forces.txt \
     --nodes_file examples/nodes.txt
+
+PYTHONPATH=. src/main.py \
+    --displacements_file /home/alex/Desktop/classes/S2021/COE321K/hw4/displacements.txt \
+    --elements_file /home/alex/Desktop/classes/S2021/COE321K/hw4/elements.txt \
+    --forces_file /home/alex/Desktop/classes/S2021/COE321K/hw4/forces.txt \
+    --nodes_file /home/alex/Desktop/classes/S2021/COE321K/hw4/nodes.txt
 """
 
 import argparse
@@ -35,15 +41,11 @@ def main(
     k_global = np.zeros(2 * [2 * len(node_structure.get_nodes())])
 
     global_forces = forces_structure.force_vec
-    print("G", global_forces)
     displacement_vec = node_structure.displacement_vec
 
     for idx, element_ in element_structure.elements.items():
-        x = (element_.node1 - 1) * 2
-        y = (element_.node2 - 1) * 2
-        print(idx, element_)
-        print(k_global[x : x + 4, x : x + 2].shape)
-        print(element_.stiffnes_matrix[:, :2].shape)
+        x = int((element_.node1 - 1) * 2)
+        y = int((element_.node2 - 1) * 2)
         k_global[x : x + 2, x : x + 2] += element_.stiffnes_matrix[:2, :2]
         k_global[x : x + 2, y : y + 2] += element_.stiffnes_matrix[:2, 2:]
         k_global[y : y + 2, y : y + 2] += element_.stiffnes_matrix[2:, 2:]
@@ -73,8 +75,7 @@ def main(
         global_forces = np.delete(global_forces, rows[0], 1)
         displacement_vec = np.delete(displacement_vec, rows[0], 1)
         rows = [r - 1 for r in rows[1:]]
-    print("G", global_forces)
-    print(k_global_unreduced)
+
     displacements = np.linalg.solve(k_global, np.transpose(global_forces))
 
     d = 0
@@ -90,12 +91,11 @@ def main(
 
     displacement_vec = node_structure.displacement_vec
 
-    print(displacements)
     for solved_d, value in zip(solved_displacements, displacements[:, 0]):
         displacement_vec[0, solved_d] = value
 
-    print(displacement_vec)
-    print(np.matmul(k_global_unreduced, np.transpose(displacement_vec)))
+    print(f">> Displacement vector:\n{displacement_vec}")
+    print(f">> Internal Forces:\n{np.matmul(k_global_unreduced, np.transpose(displacement_vec))}")
 
 
 if __name__ == "__main__":

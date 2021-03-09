@@ -17,7 +17,14 @@ class Nodes:
     def __init__(
         self, nodes_file: pathlib.Path, displacements_file: pathlib.Path
     ) -> None:
-        assert nodes_file.is_file(), f"Can't read {nodes_file}."
+        if not isinstance(nodes_file, pathlib.Path):
+            raise TypeError(f"{nodes_file} must be a pathlib.Path.")
+        if not isinstance(displacements_file, pathlib.Path):
+            raise TypeError(f"{displacements_file} must be a pathlib.Path.")
+        if not nodes_file.is_file():
+            raise FileNotFoundError(f"Can't read {nodes_file}.")
+        if not displacements_file.is_file():
+            raise FileNotFoundError(f"Can't read {displacements_file}.")
 
         # This dictionary will hold keys of global node ids and the values
         # are the corresponding nodes.
@@ -38,9 +45,9 @@ class Nodes:
             # The first line is the number of known displacements.
             if idx == 0:
                 continue
-
+    
             data = [float(n) for n in text.split()]
-
+            
             # Displacement in x direction
             if data[1] == 1:
                 self.nodes[data[0]].dx = data[2]

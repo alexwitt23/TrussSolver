@@ -1,4 +1,5 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_python//python:python.bzl", "py_library", "py_test")
 
 cc_binary(
     name = "main",
@@ -11,4 +12,33 @@ cc_binary(
         "@com_google_logging//:glog",
     ],
     visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "elements",
+    srcs = [
+        "elements.py",
+    ],
+    deps = [":nodes"]
+)
+
+py_test(
+    name = "elements_test",
+    srcs = ["elements_test.py"],
+    deps = [":elements"],
+    data = ["//examples/problem1:input_files"],
+)
+
+py_library(
+    name = "nodes",
+    srcs = [
+        "nodes.py",
+    ],
+)
+
+py_test(
+    name = "nodes_test",
+    srcs = ["nodes_test.py"],
+    deps = [":nodes"],
+    data = ["//examples/problem1:input_files"],
 )
