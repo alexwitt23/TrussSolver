@@ -12,6 +12,19 @@ PYTHONPATH=. src/main.py \
     --elements_file /home/alex/Desktop/classes/S2021/COE321K/hw4/elements.txt \
     --forces_file /home/alex/Desktop/classes/S2021/COE321K/hw4/forces.txt \
     --nodes_file /home/alex/Desktop/classes/S2021/COE321K/hw4/nodes.txt
+
+
+PYTHONPATH=. src/main.py \
+    --displacements_file examples/hw2/displacements.txt \
+    --elements_file examples/hw2/elements.txt \
+    --forces_file examples/hw2/forces.txt \
+    --nodes_file examples/hw2/nodes.txt
+
+PYTHONPATH=. src/main.py \
+    --displacements_file examples/hw4/displacements.txt \
+    --elements_file examples/hw4/elements.txt \
+    --forces_file examples/hw4/forces.txt \
+    --nodes_file examples/hw4/nodes.txt
 """
 
 import argparse

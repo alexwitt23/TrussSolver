@@ -78,7 +78,13 @@ class Solver:
         for solved_d, value in zip(solved_displacements, displacements[:, 0]):
             displacement_vec[0, solved_d] = value
 
-        print(f">> Displacement vector:\n{displacement_vec}")
-        print(f">> Internal Forces:\n{np.matmul(k_global_unreduced, np.transpose(displacement_vec))}")
+        print(f">> Displacement vector:")
+        for idx, item in enumerate(displacement_vec[0]):
+            print(f"Node_{idx // 2 + 1} displacement, DOF {idx % 2}: {item:.5E}")
+
+        print(">> Internal Forces:")
+        internal_forces = np.matmul(k_global_unreduced, np.transpose(displacement_vec))
+        for idx, item in enumerate(internal_forces[:, 0]):
+            print(f"Node_{idx // 2 + 1} External Force, DOF {idx % 2}: {item:.5E}")
 
 
