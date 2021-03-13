@@ -1,4 +1,3 @@
-
 import copy
 
 import numpy as np
@@ -9,18 +8,16 @@ from src import nodes
 
 
 class Solver:
-
     def __init__(
         self,
         node_structure: nodes.Nodes,
         elements_structure: elements.Elements,
-        forces_structure: forces.Forces
+        forces_structure: forces.Forces,
     ) -> None:
         self.node_structure = node_structure
         self.element_structure = elements_structure
         self.forces_structure = forces_structure
 
-    
     def solve(self):
         k_global = np.zeros(2 * [2 * len(self.node_structure.get_nodes())])
 
@@ -82,9 +79,22 @@ class Solver:
         for idx, item in enumerate(displacement_vec[0]):
             print(f"Node_{idx // 2 + 1} displacement, DOF {idx % 2}: {item:.5E}")
 
-        print(">> Internal Forces:")
+        print(f">> Internal Forces:")
+        internal_forces = self.element_structure.internal_forces
+        for idx, item in enumerate(internal_forces):
+            print(f"Element_{idx + 1} Internal Force: {item:.5E}")
+
+        print(">> External Forces:")
         internal_forces = np.matmul(k_global_unreduced, np.transpose(displacement_vec))
         for idx, item in enumerate(internal_forces[:, 0]):
             print(f"Node_{idx // 2 + 1} External Force, DOF {idx % 2}: {item:.5E}")
 
+        print(">> Element Strains:")
+        element_strains = self.element_structure.find_element_strain()
+        for idx, item in enumerate(element_strains):
+            print(f"Element_{idx + 1} Strain: {item:.5E}")
 
+        print(">> Element Stresses:")
+        element_stresses = self.element_structure.find_element_stress()
+        for idx, item in enumerate(element_stresses):
+            print(f"Element_{idx + 1} Stress: {item:.5E}")

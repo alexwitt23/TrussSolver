@@ -53,7 +53,7 @@ def main(
     truss_solver = solver.Solver(node_structure, element_structure, forces_structure)
     truss_solver.solve()
 
-    
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(__doc__)
     parser.add_argument("--displacements_file", type=pathlib.Path, required=True)

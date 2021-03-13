@@ -45,9 +45,9 @@ class Nodes:
             # The first line is the number of known displacements.
             if idx == 0:
                 continue
-    
+
             data = [float(n) for n in text.split()]
-            
+
             # Displacement in x direction
             if data[1] == 1:
                 self.nodes[data[0]].dx = data[2]

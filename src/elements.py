@@ -34,9 +34,7 @@ class Elements:
                 self.num_elements = int(text)
             else:
                 # Strip the line of everything and just get the numbers
-                self.elements[idx] = Element(
-                    *[float(n) for n in text.split()]
-                )
+                self.elements[idx] = Element(*[float(n) for n in text.split()])
 
     def contruct_element_stiffness_matrices(self, node_structure: nodes.Nodes) -> None:
         """Take in the nodes list for the structure and create the element
@@ -73,15 +71,34 @@ class Elements:
             cos = (node2.x - node1.x) / element_length
             sin = (node2.y - node1.y) / element_length
 
-            self.internal_forces.append(
-                element.a * element.e * ((node2.dx - node1.dx) / element_length) * cos
-                + ((node2.dy - node1.dy) / element_length) * sin
+            eps = ((node2.dx - node1.dx) / element_length) * cos + (
+                (node2.dy - node1.dy) / element_length
+            ) * sin
+            self.internal_forces.append(element.a * element.e * eps)
+
+    def find_element_strain(self):
+        self.element_strains = []
+        for idk, element in self.elements.items():
+            # Get the x and y positions of this elements nodes.
+            node1 = self.node_structure[element.node1]
+            node2 = self.node_structure[element.node2]
+
+            element_length = (
+                (node1.x - node2.x) ** 2 + (node1.y - node2.y) ** 2
+            ) ** 0.5
+            element_length_new = (
+                (node1.x - node2.x + node1.dx - node2.dx) ** 2
+                + (node1.y - node2.y + node1.dy - node2.dy) ** 2
+            ) ** 0.5
+
+            self.element_strains.append(
+                (element_length_new - element_length) / element_length
             )
+        return self.element_strains
 
+    def find_element_stress(self):
+        self.element_stress = []
+        for force, element in zip(self.internal_forces, self.elements.values()):
+            self.element_stress.append(force / element.a)
 
-if __name__ == "__main__":
-    Elements(
-        pathlib.Path(
-            "/home/alex/Desktop/classes/S2021/COE321K/code/examples/elements.txt"
-        )
-    )
+        return self.element_stress
