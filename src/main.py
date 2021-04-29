@@ -25,6 +25,26 @@ PYTHONPATH=. src/main.py \
     --elements_file examples/hw4/elements.txt \
     --forces_file examples/hw4/forces.txt \
     --nodes_file examples/hw4/nodes.txt
+
+
+PYTHONPATH=. src/main.py \
+    --displacements_file ../hw3_input_files/displacements.txt \
+    --elements_file ../hw3_input_files/elements.txt \
+    --forces_file ../hw3_input_files/forces.txt \
+    --nodes_file ../hw3_input_files/nodes.txt
+
+PYTHONPATH=. src/main.py \
+    --displacements_file ../hw5/displacements.txt \
+    --elements_file ../hw5/elements.txt \
+    --forces_file ../hw5/forces.txt \
+    --nodes_file ../hw5/nodes.txt
+
+PYTHONPATH=. src/main.py \
+    --displacements_file examples/hw5/displacements.txt \
+    --elements_file examples/hw5/elements.txt \
+    --forces_file examples/hw5/forces.txt \
+    --nodes_file examples/hw5/nodes.txt
+
 """
 
 import argparse
