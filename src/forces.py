@@ -9,11 +9,12 @@ class Force:
     node_idx: int
     x_component: float = None
     y_component: float = None
+    z_component: float = None
 
 
 class Forces:
     def __init__(self, forces_file: pathlib.Path, num_nodes: int) -> None:
-        assert forces_file.is_file(), f"Can't read {elements_file}."
+        assert forces_file.is_file(), f"Can't read {forces_file}."
 
         self.forces = {}
 
@@ -31,12 +32,17 @@ class Forces:
                 # Y-direction
                 elif items[1] == 2:
                     self.forces[idx] = Force(items[0], y_component=items[2])
+                # Z-direction
+                elif items[1] == 3:
+                    self.forces[idx] = Force(items[0], z_component=items[2])
 
-        self.force_vec = np.zeros((1, 2 * num_nodes))
+        self.force_vec = np.zeros((1, 3 * num_nodes))
         for force in self.forces.values():
-            idx = (force.node_idx - 1) * 2
+            idx = (force.node_idx - 1) * 3
 
             if force.x_component is not None:
                 self.force_vec[0, int(idx)] = force.x_component
             if force.y_component is not None:
                 self.force_vec[0, int(idx) + 1] = force.y_component
+            if force.z_component is not None:
+                self.force_vec[0, int(idx) + 2] = force.z_component

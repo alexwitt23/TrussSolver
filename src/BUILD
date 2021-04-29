@@ -26,7 +26,7 @@ py_test(
     name = "elements_test",
     srcs = ["elements_test.py"],
     deps = [":elements"],
-    data = ["//examples/problem1:input_files"],
+    data = ["//examples/hw1:input_files"],
 )
 
 py_library(
@@ -40,5 +40,5 @@ py_test(
     name = "nodes_test",
     srcs = ["nodes_test.py"],
     deps = [":nodes"],
-    data = ["//examples/problem1:input_files"],
+    data = ["//examples/hw1:input_files"],
 )

@@ -9,8 +9,10 @@ class Node:
     global_idx: int
     x: float
     y: float
+    z: float
     dx: float = None
     dy: float = None
+    dz: float = None
 
 
 class Nodes:
@@ -53,17 +55,21 @@ class Nodes:
                 self.nodes[data[0]].dx = data[2]
             elif data[1] == 2:
                 self.nodes[data[0]].dy = data[2]
+            elif data[1] == 3:
+                self.nodes[data[0]].dz = data[2]
             else:
                 raise ValueError("Unsported direction in displacements file.")
 
         # Create the displacement vector
-        self.displacement_vec = np.zeros((1, 2 * len(self.nodes)))
+        self.displacement_vec = np.zeros((1, 3 * len(self.nodes)))
         for node in self.nodes.values():
-            x = int((node.global_idx - 1) * 2)
+            x = int((node.global_idx - 1) * 3)
             if node.dx is not None:
                 self.displacement_vec[0, x] = node.dx
             if node.dy is not None:
                 self.displacement_vec[0, x + 1] = node.dy
+            if node.dz is not None:
+                self.displacement_vec[0, x + 2] = node.dz
 
     def get_nodes(self):
         return self.nodes
