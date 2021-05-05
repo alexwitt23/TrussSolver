@@ -2,9 +2,9 @@ import copy
 
 import numpy as np
 
-from src import elements
-from src import forces
-from src import nodes
+from src.beam import elements
+from src.beam import forces
+from src.beam import nodes
 
 
 class Solver:

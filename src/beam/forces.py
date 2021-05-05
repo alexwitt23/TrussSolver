@@ -9,7 +9,7 @@ class Force:
     node_idx: int
     x_component: float = None
     y_component: float = None
-    z_component: float = None
+    moment_component: float = None
 
 
 class Forces:
@@ -32,7 +32,7 @@ class Forces:
                 # Y-direction
                 elif items[1] == 2:
                     self.forces[idx] = Force(items[0], y_component=items[2])
-                # Z-direction
+                # Moment
                 elif items[1] == 3:
                     self.forces[idx] = Force(items[0], z_component=items[2])
 
@@ -44,5 +44,5 @@ class Forces:
                 self.force_vec[0, int(idx)] = force.x_component
             if force.y_component is not None:
                 self.force_vec[0, int(idx) + 1] = force.y_component
-            if force.z_component is not None:
-                self.force_vec[0, int(idx) + 2] = force.z_component
+            if force.moment_component is not None:
+                self.force_vec[0, int(idx) + 2] = force.moment_component

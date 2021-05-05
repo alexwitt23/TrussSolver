@@ -5,7 +5,7 @@ import unittest
 
 import numpy as np
 
-from src import nodes
+from src.beam import nodes
 
 
 class NodesInit(unittest.TestCase):

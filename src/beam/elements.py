@@ -3,7 +3,7 @@ import pathlib
 
 import numpy as np
 
-from src import nodes
+from src.beam import nodes
 
 
 @dataclasses.dataclass
@@ -47,10 +47,20 @@ class Elements:
             node2 = node_structure[element.node2]
 
             k_local = np.zeros((6, 6))
-            k_local[0, 0] = 1
-            k_local[3, 0] = -1
-            k_local[0, 3] = -1
-            k_local[3, 3] = 1
+            k_local[0::3, 0::3] = 1
+            k_local[1::3, 1::3] = 12
+            k_local[[2, 5], [2, 5]] = 4
+            k_local[[5, 2], [2, 5]] = 4
+            k_local[1::3, 2::3] = 6
+            k_local[2::3, 1::3] = 6
+            k_local[0, 3] *= -1
+            k_local[3, 0] *= -1
+            k_local[1, 4] *= -1
+            k_local[4, 1] *= -1
+            k_local[4, 2] *= -1
+            k_local[2, 4] *= -1
+            k_local[4, 5] *= -1
+            k_local[5, 4] *= -1
 
             # Form rotation matrix
 
@@ -59,20 +69,17 @@ class Elements:
                 + (node1.y - node2.y) ** 2
                 + (node1.z - node2.z) ** 2
             ) ** 0.5
-            theta1x = (node2.x - node1.x) / element_length
-            theta1y = (node2.y - node1.y) / element_length
-            theta1z = (node2.z - node1.z) / element_length
 
+            cos = (node2.x - node1.x) / element_length
+            sin = (node2.y - node1.y) / element_length
             rotation = np.zeros((6, 6))
-            rotation[0, 0] = theta1x
-            rotation[0, 1] = theta1y
-            rotation[0, 2] = theta1z
-            rotation[3, 3] = theta1x
-            rotation[3, 4] = theta1y
-            rotation[3, 5] = theta1z
+            rotation[[0, 1, 3, 4], [0, 1, 3, 4]] = cos
+            rotation[[0, 3], [1, 4]] = sin
+            rotation[[1, 4], [0, 3]] = -sin
+            rotation[[2, 5], [2, 5]] = 1
 
             element.stiffnes_matrix = (
-                np.matmul(np.matmul(rotation.transpose(), k_local), rotation)
+                rotation.transpose() * k_local * rotation
                 * element.e
                 * element.a
                 / element_length

@@ -39,7 +39,7 @@ PYTHONPATH=. src/main.py \
     --forces_file ../hw5/forces.txt \
     --nodes_file ../hw5/nodes.txt
 
-PYTHONPATH=. src/main.py \
+PYTHONPATH=. src/beam/main.py \
     --displacements_file examples/hw5/displacements.txt \
     --elements_file examples/hw5/elements.txt \
     --forces_file examples/hw5/forces.txt \
@@ -53,10 +53,10 @@ import pathlib
 
 import numpy as np
 
-from src import elements
-from src import forces
-from src import nodes
-from src import solver
+from src.beam import elements
+from src.beam import forces
+from src.beam import nodes
+from src.beam import solver
 
 
 def main(
