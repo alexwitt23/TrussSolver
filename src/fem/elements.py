@@ -3,7 +3,7 @@ import pathlib
 
 import numpy as np
 
-from src.beam import nodes
+from src.fem import nodes
 
 
 @dataclasses.dataclass
@@ -11,8 +11,9 @@ class Element:
     idx: int
     node1: int
     node2: int
-    e: int
-    a: int
+    node3: int
+    e: int = None
+    a: int = None
     stiffnes_matrix: np.ndarray = None
     length: float = None
 
@@ -30,12 +31,14 @@ class Elements:
 
         # Read the elements files
         for idx, text in enumerate(elements_file.read_text().splitlines()):
-            # The first line is the number of elements.
+            # The first line is the number of elements, e and a
             if idx == 0:
-                self.num_elements = int(text)
+                self.num_elements, e, a = [float(n) for n in text.split()]
             else:
                 # Strip the line of everything and just get the numbers
-                self.elements[idx] = Element(*[float(n) for n in text.split()])
+                self.elements[idx] = Element(
+                    *[float(n) for n in text.split()], e=e, a=a
+                )
 
     def contruct_element_stiffness_matrices(self, node_structure: nodes.Nodes) -> None:
         """Take in the nodes list for the structure and create the element
@@ -45,41 +48,31 @@ class Elements:
             # Get the x and y positions of this elements nodes.
             node1 = node_structure[element.node1]
             node2 = node_structure[element.node2]
+            node3 = node_structure[element.node3]
 
-            k_local = np.zeros((6, 6))
-            k_local[0::3, 0::3] = 1
-            k_local[1::3, 1::3] = 12
-            k_local[[2, 5], [2, 5]] = 4
-            k_local[[5, 2], [2, 5]] = 4
-            k_local[1::3, 2::3] = 6
-            k_local[2::3, 1::3] = 6
-            k_local[0, 3] *= -1
-            k_local[3, 0] *= -1
-            k_local[1, 4] *= -1
-            k_local[4, 1] *= -1
-            k_local[4, 2] *= -1
-            k_local[2, 4] *= -1
-            k_local[4, 5] *= -1
-            k_local[5, 4] *= -1
+            k_local = np.zeros((3, 6))
+            k_local[0, 0] = node2.y - node3.y
+            k_local[0, 2] = -node1.y + node3.y
+            k_local[0, 4] = node1.y - node2.y
 
-            # Form rotation matrix
+            k_local[1, 1] = -node2.x + node3.x
+            k_local[1, 3] = node1.x - node3.x
+            k_local[1, 4] = -node1.x + node2.x
+
+            k_local[2, 0] = -node2.x + node3.x
+            k_local[2, 1] = node2.y - node3.y
+            k_local[2, 2] = node1.x - node3.x
+            k_local[2, 3] = -node1.y + node3.y
+            k_local[2, 4] = -node1.x + node2.x
+            k_local[2, 5] = node1.y - node2.y
 
             element_length = (
                 (node1.x - node2.x) ** 2
                 + (node1.y - node2.y) ** 2
-                + (node1.z - node2.z) ** 2
             ) ** 0.5
 
-            cos = (node2.x - node1.x) / element_length
-            sin = (node2.y - node1.y) / element_length
-            rotation = np.zeros((6, 6))
-            rotation[[0, 1, 3, 4], [0, 1, 3, 4]] = cos
-            rotation[[0, 3], [1, 4]] = sin
-            rotation[[1, 4], [0, 3]] = -sin
-            rotation[[2, 5], [2, 5]] = 1
-
             element.stiffnes_matrix = (
-                rotation.transpose() * k_local * rotation
+                np.matmul(k_local.transpose(), k_local)
                 * element.e
                 * element.a
                 / element_length
@@ -96,11 +89,9 @@ class Elements:
             element_length = element.length
             theta1x = (node2.x - node1.x) / element_length
             theta1y = (node2.y - node1.y) / element_length
-            theta1z = (node2.z - node1.z) / element_length
             eps = (
                 ((node2.dx - node1.dx) / element_length) * theta1x
                 + ((node2.dy - node1.dy) / element_length) * theta1y
-                + ((node2.dy - node1.dy) / element_length) * theta1z
             )
             self.internal_forces.append(element.a * element.e * eps)
 
@@ -115,7 +106,6 @@ class Elements:
             element_length_new = (
                 (node1.x - node2.x + node1.dx - node2.dx) ** 2
                 + (node1.y - node2.y + node1.dy - node2.dy) ** 2
-                + (node1.z - node2.z + node1.dz - node2.dz) ** 2
             ) ** 0.5
 
             self.element_strains.append(
